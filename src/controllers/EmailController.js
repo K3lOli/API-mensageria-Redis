@@ -1,28 +1,41 @@
-const MailQueue = require("../queue/MailQueue");
+// const MailQueue = require("../queue/MailQueue");
 
-async function sendEmail(request, reply){
+// const MailQueue = require("../lib/Mail")
+
+const Queue = require("../lib/Queue");
+
+async function sendEmail(req, res){
     const {
         email,
         firstName,
-        lastName
-    } = request.body;
+        secondName
+    } = req.body;
 
-    const template = `
-        Olá ${firstName} ${lastName}, sua assinatura foi confirmada!
-        Para acessar seus recursos exclusivos você precisa basta clicar aqui.
-    `
-
-    try {
-        await MailQueue.add({
-            to: email,
-            from: "k3lson.oliveira@gmail.com",
-            subject: "Assinatura Confirmada",
-            text: template
-        })
-        return reply.code(200).send();
-    } catch {
-        return reply.code(500).send("Internal Server Error");
+    const user = {
+        email,
+        firstName,
+        secondName
     }
+
+    await Queue.add("RegistrationMail", { user });
+
+    // const template = `
+        
+    // `
+
+    // try {
+    //     // await MailQueue.add({
+    //     //     to: email,
+    //     //     from: "k3lson.oliveira@gmail.com",
+    //     //     subject: "Assinatura Confirmada",
+    //     //     text: `Olá ${firstName} ${lastName}, sua assinatura foi confirmada!
+    //     //     Para acessar seus recursos exclusivos você precisa basta clicar aqui.`
+    //     // })
+    //     return reply.code(200).send();
+    // } catch {
+    //     return reply.code(500).send("Internal Server Error");
+    // }
+    return res.json(user);
 }
 
 module.exports = {
